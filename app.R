@@ -23,7 +23,6 @@ ui <- dashboardPage(
       )
     ),
   dashboardBody(
-
     tabItems(
       # First tab content
       tabItem(tabName = "Map",
