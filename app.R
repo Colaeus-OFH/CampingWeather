@@ -3,7 +3,7 @@
 library(shinydashboard)
 library(timeDate)
 library(dplyr)
-#library(tidyverse)
+library(lubridate)
 library(ggplot2)
 library(shiny)
 library(leaflet)
@@ -73,10 +73,11 @@ server <- function(input, output) {
   
   output$NStemp <- renderPlot({
     con <- dbConnect(RSQLite::SQLite(),"~/CampingWeather.db")
-    
-    NS_Temps <- dbGetQuery(con, "SELECT StationName, Year, Month, Day, MeanTemp_C from EC_dly_recs WHERE Month = 7")
+    startMonth = month(input$startDate)
+    startDay = day(input$startDate)
+    qryStr <- paste("SELECT StationName, DateTime_LST, Year, Month, Day, MeanTemp_C from EC_dly_recs WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+    NS_Temps <- dbGetQuery(con,  qryStr)
     dbDisconnect(con)
-    
     hist(NS_Temps$MeanTemp_C)
   })
   }
