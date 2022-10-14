@@ -12,17 +12,24 @@ Doug Merrett ⓒ 2022 OFH Consulting
 ## install.packages("RSocrata")
 
 library("RSocrata")
+library("dplyr")
+library("lubridate")
 ```
-
+### Load JSON data from the socrata API endpoint.
+Definitely need to pare the load down, even pulling one stations grabs over 100,000 records
+Should only need 4 days worth over however many years available
 ```{r}
+startTime <- Sys.time()
 df <- read.socrata(
-  "https://data.novascotia.ca/resource/kafq-j9u4.json?site_id=RNSAM",
+  "https://data.novascotia.ca/resource/kafq-j9u4.json?air_temperature=17.4",
   app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
-#  email     = "user@example.com",
-#  password  = "fakepassword"
 )
+endTime <- Sys.time()
+  
+# prints recorded time
+print(endTime - startTime)
 ```
-After the site load dig in
+### After the site load dig in to the data.
 
 ```{r}
 unique(year(df$datetimeutc))
