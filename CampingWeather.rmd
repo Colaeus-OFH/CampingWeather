@@ -20,10 +20,11 @@ Definitely need to pare the load down, even pulling one stations grabs over 100,
 Should only need 4 days worth over however many years available
 ```{r}
 startTime <- Sys.time()
+
 df <- read.socrata(
-  "https://data.novascotia.ca/resource/kafq-j9u4.json?air_temperature=17.4",
+  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature?$where=site_id=RNSGV",
   app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
-)
+)site_id
 endTime <- Sys.time()
   
 # prints recorded time
