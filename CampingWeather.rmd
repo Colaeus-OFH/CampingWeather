@@ -14,15 +14,20 @@ Doug Merrett ⓒ 2022 OFH Consulting
 library("RSocrata")
 library("dplyr")
 library("lubridate")
+library("timeDate")
+
+setRmetricsOptions(myFinCenter = "Halifax")
+today <- as.Date(Sys.timeDate())
 ```
 ### Load JSON data from the socrata API endpoint.
 Definitely need to pare the load down, even pulling one stations grabs over 100,000 records
 Should only need 4 days worth over however many years available
 ```{r}
 startTime <- Sys.time()
-
+startDate <- today
+endDate <- today + 4
 df <- read.socrata(
-  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month&$where=month = 10 AND site_id='RNSGV'",
+  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 10 AND (theday between 15 and 19) AND site_id='RNSGV'",
   app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
 )
 endTime <- Sys.time()
