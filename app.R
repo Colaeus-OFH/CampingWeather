@@ -9,7 +9,7 @@ library(shiny)
 library(leaflet)
 library(DBI)
 library(RSQLite)
-# library(RSocrata)
+library(RSocrata)
 # library(openair)
 
 # Get todays date for plot
@@ -62,16 +62,19 @@ server <- function(input, output) {
   NS_PW_labels <- dbGetQuery(con, "SELECT Site_Name, Long, Lat from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
   dbDisconnect(con)
   
-  output$NSmap <- renderLeaflet({
+  output$NSmap <- renderLeaflet(
+    {
     # Use leaflet() here, and only include aspects of the map that
     # won't need to change dynamically (at least, not unless the
     # entire map is being torn down and recreated).
     leaflet(NS_PW_labels) %>% addProviderTiles(providers$Esri.WorldTopoMap) %>%
       setView(lng=-63.611, lat=44.5, zoom = 8) %>%
       addMarkers(lng=as.numeric(NS_PW_labels$Long), lat=as.numeric(NS_PW_labels$Lat), popup=NS_PW_labels$Site_Name)
-  })
+  }
+  )
   
-  output$NStemp <- renderPlot({
+  output$NStemp <- renderPlot(
+    {
     con <- dbConnect(RSQLite::SQLite(),"~/CampingWeather.db")
     startMonth = month(input$startDate)
     startDay = day(input$startDate)
@@ -79,7 +82,8 @@ server <- function(input, output) {
     NS_Temps <- dbGetQuery(con,  qryStr)
     dbDisconnect(con)
     hist(NS_Temps$MeanTemp_C)
-  })
+  }
+  )
   }
 
 shinyApp(ui, server)

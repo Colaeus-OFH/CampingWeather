@@ -10,11 +10,14 @@ Doug Merrett ⓒ 2022 OFH Consulting
 ```{r}
 ## Install the required package with:
 ## install.packages("RSocrata")
+## install.packages("remotes")
+## install.packages("vetiver")
 
 library("RSocrata")
 library("dplyr")
 library("lubridate")
 library("timeDate")
+library("vetiver")
 
 setRmetricsOptions(myFinCenter = "Halifax")
 today <- as.Date(Sys.timeDate())
