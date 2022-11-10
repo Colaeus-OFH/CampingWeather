@@ -23,29 +23,33 @@ setRmetricsOptions(myFinCenter = "Halifax")
 today <- as.Date(Sys.timeDate())
 ```
 ### Load JSON data from the socrata API endpoint.
-Definitely need to pare the load down, even pulling one stations grabs over 100,000 records
+Search parameters in the load to pare the load down.  Pulling one stations complete data grabs over 100,000 records!
 Should only need 4 days worth over however many years available
 ```{r}
+# Read list of stations at start of session but not as inputs updated
+
+stations <- read.socrata(
+  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 7 AND theday = 15",
+  app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
+)
+stationList <- unique(stations$site_id)
+
+# Read the results of the inputs (or default set) whenever there's a change
 startTime <- Sys.time()
 startDate <- today
 endDate <- today + 4
 df <- read.socrata(
-  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 10 AND (theday between 15 and 19) AND site_id='RNSGV'",
+  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 10 AND (theday between 15 and 19) AND site_id='RNSAM'",
   app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
 )
 endTime <- Sys.time()
   
 # prints recorded time
-print(endTime - startTime)
+# print(endTime - startTime)
 ```
 ### After the site load dig in to the data.
 
 ```{r}
-unique(year(df$datetimeutc))
+
+
 ```
-
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Ctrl+Alt+I*.
-
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Ctrl+Shift+K* to preview the HTML file).
-
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
