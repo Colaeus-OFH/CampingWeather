@@ -18,6 +18,9 @@ library("dplyr")
 library("lubridate")
 library("timeDate")
 library("vetiver")
+library("leaflet")
+library("DBI")
+library("RSQLite")
 
 setRmetricsOptions(myFinCenter = "Halifax")
 today <- as.Date(Sys.timeDate())
@@ -28,13 +31,12 @@ Should only need 4 days worth over however many years available
 ```{r}
 # Read list of stations at start of session but not as inputs updated
 
-stations <- read.socrata(
-  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 7 AND theday = 15",
-  app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
-)
-stationList <- unique(stations$site_id)
+con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+stations <- dbGetQuery(con, "SELECT * from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
+dbDisconnect(con)
 
-# Read the results of the inputs (or default set) whenever there's a change
+stationList <- unique(stations$SiteID)
+
 startTime <- Sys.time()
 startDate <- today
 endDate <- today + 4
