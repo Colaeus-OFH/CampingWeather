@@ -10,16 +10,24 @@ library(leaflet)
 library(DBI)
 library(RSQLite)
 library(RSocrata)
+library(vetiver)
 # library(openair)
 
 # Get todays date for plot
 setRmetricsOptions(myFinCenter = "Halifax")
 today <- as.Date(Sys.timeDate())
 
-con <- dbConnect(RSQLite::SQLite(),"~/CampingWeather.db")
+# Create camping database of EC and lat/long station data to pull from
 
-NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data ORDER BY Site_Name")
-dbDisconnect(con)
+# stations <- read.socrata(
+#   "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 7 AND theday = 15",
+#   app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
+# )
+# stationList <- unique(stations$site_id)
+# 
+# con <- dbConnect(RSQLite::SQLite(),"~/CampingWeather.db")
+# NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data ORDER BY Site_Name")
+# dbDisconnect(con)
 
 ui <- dashboardPage(
     dashboardHeader(title = "Camping Weather"),
