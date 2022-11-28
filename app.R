@@ -25,9 +25,9 @@ today <- as.Date(Sys.timeDate())
 # )
 # stationList <- unique(stations$site_id)
 # 
-# con <- dbConnect(RSQLite::SQLite(),"~/CampingWeather.db")
-# NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data ORDER BY Site_Name")
-# dbDisconnect(con)
+con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db.db")
+NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data ORDER BY Site_Name")
+dbDisconnect(con)
 
 ui <- dashboardPage(
     dashboardHeader(title = "Camping Weather"),
