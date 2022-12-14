@@ -33,6 +33,8 @@ Should only need 4 days worth over however many years available
 
 con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
 stations <- dbGetQuery(con, "SELECT * from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
+dbListTables(con)
+dbTemp <- dbGetQuery(con, "SELECT * from EC_temps")
 dbDisconnect(con)
 
 stationList <- unique(stations$SiteID)
