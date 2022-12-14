@@ -26,7 +26,7 @@ today <- as.Date(Sys.timeDate())
 # stationList <- unique(stations$site_id)
 # 
 con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
-NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data ORDER BY Site_Name")
+NSWXList <- dbGetQuery(con, "SELECT Site_Name, SiteID from RNS_data ORDER BY Site_Name")
 dbDisconnect(con)
 
 ui <- dashboardPage(
@@ -69,7 +69,7 @@ server <- function(input, output) {
   # Load the labels pulled from finding the weather stations via google street view
   con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
   
-  NS_PW_labels <- dbGetQuery(con, "SELECT Site_Name, Long, Lat from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
+  NS_PW_labels <- dbGetQuery(con, "SELECT Site_Name, SiteID, Long, Lat from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
   dbDisconnect(con)
   
   output$NSmap <- renderLeaflet(
@@ -85,7 +85,7 @@ server <- function(input, output) {
   
   output$NStemp <- renderPlot(
     {
-#      if ("EC" %in% input$NSWXPick) {
+#      if ("RNS" %in% input$NSWXPick) {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
         startMonth = month(input$startDate)
         startDay = day(input$startDate)
