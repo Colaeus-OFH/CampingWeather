@@ -25,14 +25,17 @@ today <- as.Date(Sys.timeDate())
 # )
 # stationList <- unique(stations$site_id)
 # 
-con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db.db")
-NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data ORDER BY Site_Name")
+con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+NSWXList <- dbGetQuery(con, "SELECT Site_Name, SiteID from RNS_data ORDER BY Site_Name")
+
 dbDisconnect(con)
 
 ui <- dashboardPage(
     dashboardHeader(title = "Camping Weather"),
 
     ## Sidebar content
+    ## Note the data pull varies depending on if you choose a PW (Public Works)
+    ## or EC (Environment Canada) weather station
     dashboardSidebar(
       sidebarMenu(
         dateInput("startDate", "Start Date", value = today),
@@ -65,9 +68,9 @@ ui <- dashboardPage(
 server <- function(input, output) {
 
   # Load the labels pulled from finding the weather stations via google street view
-  con <- dbConnect(RSQLite::SQLite(),"~/CampingWeather.db")
+  con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
   
-  NS_PW_labels <- dbGetQuery(con, "SELECT Site_Name, Long, Lat from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
+  NS_PW_labels <- dbGetQuery(con, "SELECT Site_Name, SiteID, Long, Lat from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
   dbDisconnect(con)
   
   output$NSmap <- renderLeaflet(
@@ -83,13 +86,15 @@ server <- function(input, output) {
   
   output$NStemp <- renderPlot(
     {
-    con <- dbConnect(RSQLite::SQLite(),"~/CampingWeather.db")
-    startMonth = month(input$startDate)
-    startDay = day(input$startDate)
-    qryStr <- paste("SELECT StationName, DateTime_LST, Year, Month, Day, MeanTemp_C from EC_dly_recs WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
-    NS_Temps <- dbGetQuery(con,  qryStr)
-    dbDisconnect(con)
-    hist(NS_Temps$MeanTemp_C)
+#      if ("RNS" %in% input$NSWXPick) {
+        con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+        startMonth = month(input$startDate)
+        startDay = day(input$startDate)
+        qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+        NS_Temps <- dbGetQuery(con,  qryStr)
+        dbDisconnect(con)
+        hist(NS_Temps$Temp_C)
+#      }
   }
   )
   }
