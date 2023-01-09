@@ -39,8 +39,7 @@ ui <- dashboardPage(
       sidebarMenu(
         dateInput("startDate", "Start Date", value = today),
         selectInput("NSWXPick","Weather Station",NSWXList),
-        menuItem("Map", tabName = "Map", icon = icon("map")),
-        menuItem("Synopsis", tabName = "Synop", icon = icon("far fa-file-alt"))
+        menuItem("Map", tabName = "Map", icon = icon("map"))
       )
     ),
   dashboardBody(
@@ -50,15 +49,10 @@ ui <- dashboardPage(
               fluidRow(
                 box(title = "Map",collapsible = TRUE, leafletOutput("NSmap")),
                 box(title = "Temp",collapsible = TRUE, plotOutput("NStemp"))
-      )),
-
-# Second tab content
-      tabItem(tabName = "Synop",
+              ),
               fluidRow(
-                box(title = "Synopsis",
-                    collapsible = TRUE,
-#                    plotOutput("NStemp")
-                )
+                box(title = "Wind",collapsible = TRUE, plotOutput("NSwind")),
+                box(title = "Precip",collapsible = TRUE, plotOutput("NSprecip"))
               )
       )
     )
@@ -93,9 +87,34 @@ server <- function(input, output) {
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
         hist(NS_Temps$Temp_C)
-#      }
   }
   )
+  output$NSwind <- renderPlot(
+    {
+      #      if ("RNS" %in% input$NSWXPick) {
+      con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+      startMonth = month(input$startDate)
+      startDay = day(input$startDate)
+      qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+      NS_Temps <- dbGetQuery(con,  qryStr)
+      dbDisconnect(con)
+      hist(NS_Temps$Temp_C)
+#      }
+    }
+)
+output$NSprecip <- renderPlot(
+  {
+    #      if ("RNS" %in% input$NSWXPick) {
+    con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+    startMonth = month(input$startDate)
+    startDay = day(input$startDate)
+    qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+    NS_Temps <- dbGetQuery(con,  qryStr)
+    dbDisconnect(con)
+    hist(NS_Temps$Temp_C)
+#      }
+  }
+)
   }
 
 shinyApp(ui, server)
