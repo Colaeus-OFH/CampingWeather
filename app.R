@@ -27,6 +27,7 @@ today <- as.Date(Sys.timeDate())
 # 
 con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
 NSWXList <- dbGetQuery(con, "SELECT Site_Name, SiteID from RNS_data ORDER BY Site_Name")
+
 dbDisconnect(con)
 
 ui <- dashboardPage(
