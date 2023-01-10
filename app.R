@@ -11,6 +11,8 @@ library(DBI)
 library(RSQLite)
 library(RSocrata)
 library(vetiver)
+library(stringr)
+
 # library(openair)
 
 # Get todays date for plot
@@ -19,14 +21,8 @@ today <- as.Date(Sys.timeDate())
 
 # Create camping database of EC and lat/long station data to pull from
 
-# stations <- read.socrata(
-#   "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 7 AND theday = 15",
-#   app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
-# )
-# stationList <- unique(stations$site_id)
-# 
 con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
-NSWXList <- dbGetQuery(con, "SELECT Site_Name, SiteID from RNS_data ORDER BY Site_Name")
+NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
 
 dbDisconnect(con)
 
@@ -53,7 +49,7 @@ ui <- dashboardPage(
               ),
               fluidRow(
                 box(title = "Wind",collapsible = TRUE, plotOutput("NSwind")),
-                box(title = "Precip",collapsible = TRUE, plotOutput("NSprecip"))
+                box(title = "Precip",collapsible = TRUE, textOutput("NSprecip"))
               )
       )
     )
@@ -69,18 +65,21 @@ server <- function(input, output) {
   
   output$NSmap <- renderLeaflet(
     {
+
     # Use leaflet() here, and only include aspects of the map that
     # won't need to change dynamically (at least, not unless the
     # entire map is being torn down and recreated).
     leaflet(NS_PW_labels) %>% addProviderTiles(providers$Esri.WorldTopoMap) %>%
-      setView(lng=-63.611, lat=44.5, zoom = 8) %>%
+      setView(lng=with(NS_PW_labels,Long[Site_Name == input$NSWXPick]), lat=with(NS_PW_labels,Lat[Site_Name == input$NSWXPick]), zoom = 9) %>%
       addMarkers(lng=as.numeric(NS_PW_labels$Long), lat=as.numeric(NS_PW_labels$Lat), popup=NS_PW_labels$Site_Name)
   }
   )
   
   output$NStemp <- renderPlot(
     {
-#      if ("RNS" %in% input$NSWXPick) {
+      if (str_detect(with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"RNS")) {
+        # SOCRATA lookup
+      } else {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
         startMonth = month(input$startDate)
         startDay = day(input$startDate)
@@ -88,7 +87,8 @@ server <- function(input, output) {
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
         hist(NS_Temps$Temp_C)
-  }
+      }
+    }
   )
   output$NSwind <- renderPlot(
     {
@@ -103,18 +103,8 @@ server <- function(input, output) {
 #      }
     }
 )
-output$NSprecip <- renderPlot(
-  {
-    #      if ("RNS" %in% input$NSWXPick) {
-    con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
-    startMonth = month(input$startDate)
-    startDay = day(input$startDate)
-    qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
-    NS_Temps <- dbGetQuery(con,  qryStr)
-    dbDisconnect(con)
-    hist(NS_Temps$Temp_C)
-#      }
-  }
+output$NSprecip <- renderText(
+  str_detect(with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"RNS")
 )
   }
 

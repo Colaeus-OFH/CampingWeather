@@ -30,12 +30,18 @@ Search parameters in the load to pare the load down.  Pulling one stations compl
 Should only need 4 days worth over however many years available
 ```{r}
 # Read list of stations at start of session but not as inputs updated
+# Get todays date for plot
+
+
+# Create camping database of EC and lat/long station data to pull from
 
 con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
-stations <- dbGetQuery(con, "SELECT * from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
-dbListTables(con)
-dbTemp <- dbGetQuery(con, "SELECT * from EC_temps")
+NSWXList <- dbGetQuery(con, "SELECT Site_Name, SiteID, Lat, Long from RNS_data ORDER BY Site_Name")
+
 dbDisconnect(con)
+with(NSWXList, SiteID[Site_Name == "Avonport PW"])
+with(NSWXList, Lat[Site_Name == "Avonport PW"])
+with(NSWXList, Long[Site_Name == "Avonport PW"])
 
 stationList <- unique(stations$SiteID)
 
