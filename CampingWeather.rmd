@@ -36,9 +36,14 @@ Should only need 4 days worth over however many years available
 # Create camping database of EC and lat/long station data to pull from
 
 con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
-NSWXList <- dbGetQuery(con, "SELECT Site_Name, SiteID, Lat, Long from RNS_data ORDER BY Site_Name")
-
+curStation = "'KEJIMKUJIK 1'"
+startMonth = "1"
+startDay = "11"
+qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station LIKE ", curStation, " AND Month = ", startMonth, "AND Day = ", startDay, sep = " ")    
+NS_Temps <- dbGetQuery(con,  qryStr)
 dbDisconnect(con)
+hist(NS_Temps$Temp_C)
+
 with(NSWXList, SiteID[Site_Name == "Avonport PW"])
 with(NSWXList, Lat[Site_Name == "Avonport PW"])
 with(NSWXList, Long[Site_Name == "Avonport PW"])

@@ -11,7 +11,6 @@ library(DBI)
 library(RSQLite)
 library(RSocrata)
 library(vetiver)
-library(stringr)
 
 # library(openair)
 
@@ -77,13 +76,15 @@ server <- function(input, output) {
   
   output$NStemp <- renderPlot(
     {
-      if (str_detect(with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"RNS")) {
+#      curStation <- with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick])
+      curStation <-paste("'",with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"'",sep="")
+      if (substr(curStation,2,4) == "RNS") {
         # SOCRATA lookup
       } else {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
         startMonth = month(input$startDate)
         startDay = day(input$startDate)
-        qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+        qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
         hist(NS_Temps$Temp_C)
@@ -92,19 +93,22 @@ server <- function(input, output) {
   )
   output$NSwind <- renderPlot(
     {
-      #      if ("RNS" %in% input$NSWXPick) {
+      curStation <- paste("'",with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"'",sep="")
+      if (substr(curStation,2,4) == "RNS") {
+        # SOCRATA lookup
+      } else {
       con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
       startMonth = month(input$startDate)
       startDay = day(input$startDate)
-      qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+      qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station = ", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
       NS_Temps <- dbGetQuery(con,  qryStr)
       dbDisconnect(con)
       hist(NS_Temps$Temp_C)
-#      }
+      }
     }
 )
 output$NSprecip <- renderText(
-  str_detect(with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"RNS")
+  substr(paste("'",with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"'",sep=""),2,4) == "RNS"
 )
   }
 
