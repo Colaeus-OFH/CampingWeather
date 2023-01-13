@@ -53,10 +53,15 @@ stationList <- unique(stations$SiteID)
 startTime <- Sys.time()
 startDate <- today
 endDate <- today + 4
-df <- read.socrata(
-  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 10 AND (theday between 15 and 19) AND site_id='RNSAM'",
-  app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
-)
+#df <- read.socrata(
+#  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as #theday&$where=month = 10 AND (theday between 15 and 19) AND site_id='RNSAM'",
+#  app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
+#)
+        qryStr = "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 1 AND theday = 12 AND site_id= 'RNSAV'"
+        df <- read.socrata(
+          qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
+        )
+
 endTime <- Sys.time()
   
 # prints recorded time

@@ -76,39 +76,52 @@ server <- function(input, output) {
   
   output$NStemp <- renderPlot(
     {
-#      curStation <- with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick])
       curStation <-paste("'",with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"'",sep="")
+      startMonth = month(input$startDate)
+      startDay = day(input$startDate)
+      
       if (substr(curStation,2,4) == "RNS") {
         # SOCRATA lookup
+        qryStr <- paste("https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month =", startMonth, " AND theday =", startDay, " AND site_id=", curStation, sep = " ")
+        df <- read.socrata(
+          qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
+        )
+        hist(as.numeric(df$air_temperature), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
       } else {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
-        startMonth = month(input$startDate)
-        startDay = day(input$startDate)
         qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
-        hist(NS_Temps$Temp_C)
+        hist(as.numeric(NS_Temps$Temp_C), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
       }
     }
   )
+  
   output$NSwind <- renderPlot(
     {
-      curStation <- paste("'",with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"'",sep="")
-      if (substr(curStation,2,4) == "RNS") {
-        # SOCRATA lookup
-      } else {
-      con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+      curStation <-paste("'",with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"'",sep="")
       startMonth = month(input$startDate)
       startDay = day(input$startDate)
-      qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station = ", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
-      NS_Temps <- dbGetQuery(con,  qryStr)
-      dbDisconnect(con)
-      hist(NS_Temps$Temp_C)
+      
+      if (substr(curStation,2,4) == "RNS") {
+        # SOCRATA lookup
+        qryStr <- paste("https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month =", startMonth, " AND theday =", startDay, " AND site_id=", curStation, sep = " ")
+        df <- read.socrata(
+          qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
+        )
+        hist(as.numeric(df$air_temperature), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
+      } else {
+        con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+        qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+        NS_Temps <- dbGetQuery(con,  qryStr)
+        dbDisconnect(con)
+        hist(as.numeric(NS_Temps$Temp_C), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
       }
     }
-)
-output$NSprecip <- renderText(
-  substr(paste("'",with(NS_PW_labels,SiteID[Site_Name == input$NSWXPick]),"'",sep=""),2,4) == "RNS"
+  )
+  
+  output$NSprecip <- renderText(
+  length(NS_PW_labels)
 )
   }
 
