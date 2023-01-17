@@ -44,11 +44,11 @@ NS_Temps <- dbGetQuery(con,  qryStr)
 dbDisconnect(con)
 hist(NS_Temps$Temp_C)
 
-with(NSWXList, SiteID[Site_Name == "Avonport PW"])
-with(NSWXList, Lat[Site_Name == "Avonport PW"])
-with(NSWXList, Long[Site_Name == "Avonport PW"])
+#with(NSWXList, SiteID[Site_Name == "Avonport PW"])
+#with(NSWXList, Lat[Site_Name == "Avonport PW"])
+#with(NSWXList, Long[Site_Name == "Avonport PW"])
 
-stationList <- unique(stations$SiteID)
+#stationList <- unique(stations$SiteID)
 
 startTime <- Sys.time()
 startDate <- today
@@ -61,9 +61,11 @@ endDate <- today + 4
         df <- read.socrata(
           qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
         )
-
+df$theHour <- hour(df$datetimeutc)
+df$theYear <- year(df$datetimeutc)
 endTime <- Sys.time()
-  
+boxplot(as.numeric(air_temperature) ~ theHour, data = df, notch = TRUE)
+
 # prints recorded time
 # print(endTime - startTime)
 ```

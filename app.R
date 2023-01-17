@@ -10,7 +10,7 @@ library(leaflet)
 library(DBI)
 library(RSQLite)
 library(RSocrata)
-library(vetiver)
+#library(vetiver)
 
 # library(openair)
 
@@ -86,7 +86,9 @@ server <- function(input, output) {
         df <- read.socrata(
           qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
         )
-        hist(as.numeric(df$air_temperature), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
+        df$theHour <- hour(df$datetimeutc)
+        #hist(as.numeric(df$air_temperature), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
+        boxplot(as.numeric(air_temperature) ~ theHour, data = df, notch = TRUE, ylim = c(-30,40))
       } else {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
         qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
