@@ -88,13 +88,19 @@ server <- function(input, output) {
         )
         df$theHour <- hour(df$datetimeutc)
         #hist(as.numeric(df$air_temperature), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
-        boxplot(as.numeric(air_temperature) ~ theHour, data = df, notch = TRUE, ylim = c(-30,40))
+        yearRange <- paste(min(unique(year(df$datetimeutc))), "to", max(unique(year(df$datetimeutc))), sep = " ")
+        if (median(as.numeric(df$air_temperature),na.rm = TRUE)<=0) bpcol = "light blue" else bpcol = "light pink"
+        boxplot(as.numeric(df$air_temperature), ylim = c(-20,30),ylab = "Temperature C", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
+        abline(h=0)
       } else {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
         qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
-        hist(as.numeric(NS_Temps$Temp_C), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
+        yearRange <- paste(min(unique(NS_Temps$Year)), "to", max(unique(NS_Temps$Year)), sep = " ")
+        if (median(NS_Temps$Temp_C,na.rm = TRUE) <= 0) bpcol = "light blue" else bpcol = "light pink"
+        boxplot(as.numeric(NS_Temps$Temp_C), ylim = c(-20,30),ylab = "Temperature C", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
+        abline(h=0)
       }
     }
   )

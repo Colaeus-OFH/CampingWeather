@@ -62,9 +62,15 @@ endDate <- today + 4
           qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
         )
 df$theHour <- hour(df$datetimeutc)
+df$theZone <- cut(df$theHour,c(0,6,12,18,24))
 df$theYear <- year(df$datetimeutc)
 endTime <- Sys.time()
-boxplot(as.numeric(air_temperature) ~ theHour, data = df, notch = TRUE)
+boxplot(as.numeric(air_temperature) ~ theZone, data = df)
+# rect(-1000, -1000, 1.5, 1000, col=adjustcolor("red", 0.1))
+# rect(1.5, -1000, 3.5, 1000, col=adjustcolor("orange", 0.1))
+# rect(3.5, -1000, 5.5, 1000, col=adjustcolor("blue", 0.1))
+# rect(5.5, -1000, 1000, 1000, col=adjustcolor("green", 0.1))
+# boxplot(as.numeric(air_temperature) ~ theHour, data = df, add=TRUE)
 
 # prints recorded time
 # print(endTime - startTime)
