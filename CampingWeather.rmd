@@ -54,10 +54,10 @@ startTime <- Sys.time()
 startDate <- today
 endDate <- today + 4
 #df <- read.socrata(
-#  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as #theday&$where=month = 10 AND (theday between 15 and 19) AND site_id='RNSAM'",
+#  "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,precipitation_1_hour,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as #theday&$where=month = 10 AND (theday between 15 and 19) AND site_id='RNSAM'",
 #  app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
 #)
-        qryStr = "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,max_wind_gust_speed, avg_wind_speed,precipitation_1_hour,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 1 AND theday = 12 AND site_id= 'RNSAV'"
+        qryStr = "https://data.novascotia.ca/resource/kafq-j9u4.json?$select=site_id,datetimeutc,air_temperature,max_wind_gust_speed, avg_wind_speed,precipitation_1_hour,date_extract_m(datetimeutc) as month,date_extract_d(datetimeutc) as theday&$where=month = 1 AND theday = 12 AND site_id= 'RNSGV'"
         df <- read.socrata(
           qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
         )
@@ -68,7 +68,7 @@ endTime <- Sys.time()
 boxplot(as.numeric(air_temperature) ~ theZone, data = df)
 hist(as.numeric(df$max_wind_gust_speed))
 summary(as.numeric(df$max_wind_gust_speed))
-hist(as.numeric(df$precipitation_1_hour))
+if (sum(as.numeric(df$precipitation_1_hour),na.rm=TRUE) > 0) { hist(as.numeric(df$precipitation_1_hour)) }
 summary(as.numeric(df$precipitation_1_hour))
 # rect(-1000, -1000, 1.5, 1000, col=adjustcolor("red", 0.1))
 # rect(1.5, -1000, 3.5, 1000, col=adjustcolor("orange", 0.1))

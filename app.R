@@ -87,10 +87,11 @@ server <- function(input, output) {
           qryStr, app_token = "YIJmci7v0Fd0eHtco6IXgFBuP"
         )
         df$theHour <- hour(df$datetimeutc)
+        df$theZone <- cut(df$theHour,c(0,6,12,18,24))
         #hist(as.numeric(df$air_temperature), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE)
         yearRange <- paste(min(unique(year(df$datetimeutc))), "to", max(unique(year(df$datetimeutc))), sep = " ")
         if (median(as.numeric(df$air_temperature),na.rm = TRUE)<=0) bpcol = "light blue" else bpcol = "light pink"
-        boxplot(as.numeric(df$air_temperature), ylim = c(-20,30),ylab = "Temperature C", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
+        boxplot(as.numeric(air_temperature) ~ theZone, data = df, ylim = c(-20,30),ylab = "Temperature C", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
         abline(h=0)
       } else {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
@@ -121,8 +122,10 @@ server <- function(input, output) {
         #if (median(as.numeric(df$max_wind_gust_speed),na.rm = TRUE)<=10) bpcol = "light blue" else bpcol = "light pink"
 #        bpcol = "light blue"
 #        boxplot(as.numeric(df$max_wind_gust_speed), ylim = c(0,90),ylab = "Max Wind Gust", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
-        hist(as.numeric(df$max_wind_gust_speed),breaks = c(0,5,10,15,20,30), plot = TRUE)
-        abline(v=max(as.numeric(df$max_wind_gust_speed),na.rm=TRUE),col = "red")
+        if (sum(as.numeric(df$max_wind_gust_speed),na.rm=TRUE) > 0) {
+          hist(as.numeric(df$max_wind_gust_speed),breaks = c(0,5,10,15,20,30), plot = TRUE)
+          abline(v=max(as.numeric(df$max_wind_gust_speed),na.rm=TRUE),col = "red")
+        }
       } else {
         con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
         qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
@@ -149,7 +152,7 @@ server <- function(input, output) {
       #if (median(as.numeric(df$max_wind_gust_speed),na.rm = TRUE)<=10) bpcol = "light blue" else bpcol = "light pink"
       #        bpcol = "light blue"
       #        boxplot(as.numeric(df$max_wind_gust_speed), ylim = c(0,90),ylab = "Max Wind Gust", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
-      hist(as.numeric(df$precipitation_1_hour,na.rm=TRUE),breaks = "Sturges", plot = TRUE)
+      if (sum(as.numeric(df$precipitation_1_hour),na.rm=TRUE) > 0) { hist(as.numeric(df$precipitation_1_hour,na.rm=TRUE),breaks = "Sturges", plot = TRUE)}
     } else {
       con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
       qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
