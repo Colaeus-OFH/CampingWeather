@@ -20,7 +20,7 @@ today <- as.Date(Sys.timeDate())
 
 # Create camping database of EC and lat/long station data to pull from
 
-con <- dbConnect(RSQLite::SQLite(),"/home/doug/EnvCanDB.db")
+con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
 NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
 
 dbDisconnect(con)
@@ -57,7 +57,7 @@ ui <- dashboardPage(
 server <- function(input, output) {
 
   # Load the labels pulled from finding the weather stations via google street view
-  con <- dbConnect(RSQLite::SQLite(),"/home/doug/EnvCanDB.db")
+  con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
   
   NS_PW_labels <- dbGetQuery(con, "SELECT Site_Name, SiteID, Long, Lat from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
   dbDisconnect(con)
@@ -94,7 +94,7 @@ server <- function(input, output) {
         boxplot(as.numeric(df$air_temperature), data = df, ylim = c(-20,30),ylab = "Temperature C", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
         abline(h=0)
       } else {
-        con <- dbConnect(RSQLite::SQLite(),"/home/doug/EnvCanDB.db")
+        con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
         qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
@@ -127,7 +127,7 @@ server <- function(input, output) {
           abline(v=max(as.numeric(df$max_wind_gust_speed),na.rm=TRUE),col = "red")
         }
       } else {
-        con <- dbConnect(RSQLite::SQLite(),"/home/doug/EnvCanDB.db")
+        con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
         qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
@@ -154,7 +154,7 @@ server <- function(input, output) {
       #        boxplot(as.numeric(df$max_wind_gust_speed), ylim = c(0,90),ylab = "Max Wind Gust", xlab = paste("Chosen date:",input$startDate, "over years",yearRange),col=bpcol)
       if (sum(as.numeric(df$precipitation_1_hour),na.rm=TRUE) > 0) { hist(as.numeric(df$precipitation_1_hour,na.rm=TRUE),breaks = "Sturges", plot = TRUE,main = "Rainfall over 1 hour",xlab = "1 hour precipitation")}
     } else {
-      con <- dbConnect(RSQLite::SQLite(),"/home/doug/EnvCanDB.db")
+      con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
       qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
       NS_Temps <- dbGetQuery(con,  qryStr)
       dbDisconnect(con)

@@ -35,7 +35,7 @@ Should only need 4 days worth over however many years available
 
 # Create camping database of EC and lat/long station data to pull from
 
-con <- dbConnect(RSQLite::SQLite(),"~/EnvCanDB.db")
+con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
 curStation = "'KEJIMKUJIK 1'"
 startMonth = "1"
 startDay = "11"
