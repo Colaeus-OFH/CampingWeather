@@ -10,17 +10,16 @@ library(leaflet)
 library(DBI)
 library(RSQLite)
 library(RSocrata)
-#library(vetiver)
-
-# library(openair)
+#library(RCurl)
+#library(jsonlite)
 
 # Get todays date for plot
 setRmetricsOptions(myFinCenter = "Halifax")
 today <- as.Date(Sys.timeDate())
 
-# Create camping database of EC and lat/long station data to pull from
+# Load the sqlite EnvCanDB.db data into the con data.frame
+con <- dbConnect(RSQLite::SQLite(),"EnvCanDB.db")
 
-con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
 NSWXList <- dbGetQuery(con, "SELECT Site_Name from RNS_data WHERE Data = 'x' ORDER BY Site_Name")
 
 dbDisconnect(con)
