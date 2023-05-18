@@ -10,8 +10,6 @@ library(leaflet)
 library(DBI)
 library(RSQLite)
 library(RSocrata)
-#library(RCurl)
-#library(jsonlite)
 
 # Get todays date for plot
 setRmetricsOptions(myFinCenter = "Halifax")

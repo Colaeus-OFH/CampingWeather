@@ -1,0 +1,27 @@
+---
+title: "Camping Weather forecast notebook"
+output: html_notebook
+---
+
+Notes and testing for the Camping Weather forecast shiny app.
+
+Doug Merrett ⓒ 2022 OFH Consulting
+
+```{r}
+library("dplyr")
+library("lubridate")
+library("timeDate")
+library("leaflet")
+library("DBI")
+library("RSQLite")
+
+setRmetricsOptions(myFinCenter = "Halifax")
+today <- as.Date(Sys.timeDate())
+```
+# Read Spotwx.csv file for forecast info
+# Get todays date for plot
+```{r}
+fore <- read.csv(file = "/home/dougm/Desktop/SpotWx Forecast.csv", header = TRUE) # nolint
+summary(fore)
+plot(fore$DATETIME,fore$TMP)
+```
