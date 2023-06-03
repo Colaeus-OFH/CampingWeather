@@ -10,3 +10,5 @@ Traditionally a bottle from a “two four” or case of 24 bottles.
 
 Out of curiosity I looked up the weather over the past few years from historical Environment Canada data in the areas we would camp.  That was the impetus
 create  web app giving you the observations over ~9-10 years for a 4-day trip.
+
+# update 2-jun-2023
