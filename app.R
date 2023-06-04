@@ -125,10 +125,11 @@ server <- function(input, output) {
         }
       } else {
         con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
-        qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+        qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, WindSpd_kmh from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
         NS_Temps <- dbGetQuery(con,  qryStr)
         dbDisconnect(con)
-        hist(as.numeric(NS_Temps$Temp_C, na.rm=TRUE), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE, main="Wind Speed histogram", xlab = "Wind Gust Speed (km/hr)")
+        hist(as.numeric(NS_Temps$WindSpd_kmh, na.rm=TRUE),breaks = c(0,5,10,15,20,30), plot = TRUE,  main = "Wind Speed histogram",sub="red line marks max gust", xlab = "Average Wind Speed (km/hr)")
+        abline(v=max(as.numeric(NS_Temps$WindSpd_kmh),na.rm=TRUE),col = "red")
       }
     }
   )
@@ -152,10 +153,10 @@ server <- function(input, output) {
       if (sum(as.numeric(df$precipitation_1_hour),na.rm=TRUE) > 0) { hist(as.numeric(df$precipitation_1_hour,na.rm=TRUE),breaks = "Sturges", plot = TRUE,main = "Rainfall over 1 hour",xlab = "1 hour precipitation")}
     } else {
       con <- dbConnect(RSQLite::SQLite(),"/home/rstudio/CampingWeather/EnvCanDB.db")
-      qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, Temp_C from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
+      qryStr <- paste("SELECT Station, DateTime_LST, Year, Month, Day, PrecipAmount_mm from EC_temps WHERE Station =", curStation," AND Month =", startMonth, "AND Day =", startDay ,sep = " ")    
       NS_Temps <- dbGetQuery(con,  qryStr)
       dbDisconnect(con)
-      hist(as.numeric(NS_Temps$Temp_C), breaks = c(-30,-25,-20,-15,-10,-5,0,5,10,15,20,25,30,35,40), plot = TRUE, xlab = "1 hour precipitation",main = "Raindfall over 1 hour")
+      if (sum(as.numeric(NS_Temps$PrecipAmount_mm),na.rm=TRUE) > 0) { hist(as.numeric(NS_Temps$PrecipAmount_mm,na.rm=TRUE),breaks = "Sturges", plot = TRUE,main = "Rainfall over 1 day",xlab = "1 day precipitation")}
     }
 }
 )
